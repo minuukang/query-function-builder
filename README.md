@@ -2,6 +2,12 @@
 
 Create rest api fetch function with generate automatic query key using with [@tanstack/react-query](https://github.com/TanStack/query)!
 
+## Install
+
+```bash
+npm i query-function-builder --save
+```
+
 # Example
 
 ## 1. Create QueryFunctionBuilder
