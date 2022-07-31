@@ -45,6 +45,8 @@ export const getExampleList = apiFnBuilder.json<ExamplePagination, { next?: stri
 );
 ```
 
+> The first generic type is response, second generic is request.
+
 ## 3. Call!
 
 ### Case of immediate call
@@ -107,6 +109,8 @@ export function updateExampleDetailName(queryClient: QueryClient, id: string, ch
 ## QueryFunction
 
 QueryFunction is result of `QueryFunctionBuilder`. You can create 3 type of QueryFunction; **json, text, void**. They required `HttpMethod` and endpoint path. Optionally you can set `RequestInitParam` at third parameter.
+
+About generic, first type is response, second is request. when generic is empty, should set `unknown`.
 
 ```ts
 import { HttpMethod } from "query-function-builder";
