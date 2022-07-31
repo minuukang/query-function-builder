@@ -1,7 +1,16 @@
-import type { QueryFunctionContext, QueryOptions } from "@tanstack/react-query";
 import { HttpMethod } from "./httpMethod";
 import { createQueryResponse, QueryResponseArguments } from "./queryResponse";
 import { mergeRequestInit, RequestInitParam } from "./requestInit";
+
+export type QueryFunctionContext = {
+  signal?: AbortSignal;
+  pageParam?: any;
+};
+
+export type QueryGeneratorResult<Res> = {
+  queryKey: unknown[];
+  queryFn(context: QueryFunctionContext): Promise<Res>;
+};
 
 export type QueryFunction<Res, Req, Init extends RequestInit> = {
   (..._: QueryResponseArguments<Req, Init>): Promise<Res>;
@@ -14,10 +23,10 @@ export type QueryFunction<Res, Req, Init extends RequestInit> = {
       context: QueryFunctionContext
     ) => QueryResponseArguments<Req, Init>[0],
     requestInit?: RequestInitParam<Init>
-  ): Pick<QueryOptions<Res>, "queryKey" | "queryFn">;
+  ): QueryGeneratorResult<Res>;
   generateQuery(
     ..._: QueryResponseArguments<Req, Init>
-  ): Pick<QueryOptions<Res>, "queryKey" | "queryFn">;
+  ): QueryGeneratorResult<Res>;
 };
 
 export function createQueryFunction<Res, Req, Init extends RequestInit>({
@@ -56,19 +65,17 @@ export function createQueryFunction<Res, Req, Init extends RequestInit>({
     return [queryKey, data || null];
   }
 
-  type GenerateQueryResult = Pick<QueryOptions<Res>, "queryKey" | "queryFn">;
-
   function generateQuery(
     withContext: (
       context: QueryFunctionContext
     ) => Parameters<typeof caller>[0],
     requestInit?: Parameters<typeof caller>[1]
-  ): GenerateQueryResult;
+  ): QueryGeneratorResult<Res>;
   function generateQuery(
     ...args: Parameters<typeof caller>
-  ): GenerateQueryResult;
+  ): QueryGeneratorResult<Res>;
 
-  function generateQuery(...args: unknown[]): GenerateQueryResult {
+  function generateQuery(...args: unknown[]): QueryGeneratorResult<Res> {
     const createArgs = (
       typeof args[0] === "function"
         ? (context: QueryFunctionContext) => [
